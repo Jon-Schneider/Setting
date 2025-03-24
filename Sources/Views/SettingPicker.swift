@@ -12,10 +12,24 @@ import SwiftUI
  A multi-choice picker.
  */
 public struct SettingPicker: View, Setting {
+    public struct Choice: ExpressibleByStringLiteral {
+        public let title: String
+        public let icon: SettingIconView?
+
+        public init(_ title: String, icon: SettingIconView? = nil) {
+            self.title = title
+            self.icon = icon
+        }
+
+        public init(stringLiteral value: StaticString) {
+            self.init(String(describing: value), icon: nil)
+        }
+    }
+
     public var id: AnyHashable?
     public var icon: SettingIcon?
     public var title: String
-    public var choices: [String]
+    public var choices: [Choice]
     @Binding public var selectedIndex: Int
     public var foregroundColor: Color?
     public var horizontalSpacing = CGFloat(12)
@@ -27,7 +41,7 @@ public struct SettingPicker: View, Setting {
         id: AnyHashable? = nil,
         icon: SettingIcon? = nil,
         title: String,
-        choices: [String],
+        choices: [Choice],
         selectedIndex: Binding<Int>,
         foregroundColor: Color? = nil,
         horizontalSpacing: CGFloat = CGFloat(12),
@@ -126,7 +140,7 @@ struct SettingPickerView: View {
 
     var icon: SettingIcon?
     let title: String
-    var choices: [String]
+    var choices: [SettingPicker.Choice]
     @Binding var selectedIndex: Int
     var foregroundColor: Color?
     var horizontalSpacing = CGFloat(12)
@@ -155,7 +169,7 @@ struct SettingPickerView: View {
                     if choices.indices.contains(selectedIndex) {
                         let selectedChoice = choices[selectedIndex]
 
-                        Text(selectedChoice)
+                        Text(selectedChoice.title)
                             .foregroundColor(foregroundColor ?? settingSecondaryColor)
                     }
 
@@ -188,8 +202,12 @@ struct SettingPickerView: View {
                     .padding(.vertical, verticalPadding)
 
                 Picker("", selection: $selectedIndex) {
-                    ForEach(Array(zip(choices.indices, choices)), id: \.1) { index, choice in
-                        Text(choice).tag(index)
+                    ForEach(Array(zip(choices.indices, choices)), id: \.1.title) { index, choice in
+                        HStack {
+                            Text(choice.title)
+                            Spacer()
+                            choice.icon
+                        }.tag(index)
                     }
                 }
                 .pickerStyle(.menu)
@@ -203,12 +221,14 @@ struct SettingPickerView: View {
             .padding(.horizontal, horizontalPadding ?? edgePadding)
             .accessibilityElement(children: .combine)
         case .inline:
-            ForEach(Array(zip(choices.indices, choices)), id: \.1) { index, choice in
+            ForEach(Array(zip(choices.indices, choices)), id: \.1.title) { index, choice in
                 Button {
                     selectedIndex = index
                 } label: {
                     HStack {
-                        Text(choice)
+                        choice.icon
+
+                        Text(choice.title)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, choicesConfiguration.verticalPadding)
 
@@ -227,7 +247,7 @@ struct SettingPickerView: View {
 
 struct SettingPickerChoicesView: View {
     let title: String
-    var choices: [String]
+    var choices: [SettingPicker.Choice]
     @Binding var selectedIndex: Int
     var choicesConfiguration: SettingPicker.ChoicesConfiguration
 
@@ -243,12 +263,14 @@ struct SettingPickerChoicesView: View {
                 dividerTrailingMargin: choicesConfiguration.groupDividerTrailingMargin,
                 dividerColor: choicesConfiguration.groupDividerColor
             ) {
-                ForEach(Array(zip(choices.indices, choices)), id: \.1) { index, choice in
+                ForEach(Array(zip(choices.indices, choices)), id: \.1.title) { index, choice in
                     Button {
                         selectedIndex = index
                     } label: {
                         HStack {
-                            Text(choice)
+                            choice.icon
+
+                            Text(choice.title)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.vertical, choicesConfiguration.verticalPadding)
 

@@ -149,7 +149,7 @@ struct PreferencesView: View {
                                     choices: [
                                         "Every Hour",
                                         "Every Day",
-                                        "Every Week"
+                                        "Every Week",
                                     ],
                                     selectedIndex: $model.notificationIndex
                                 )

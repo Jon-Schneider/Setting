@@ -21,6 +21,11 @@ public struct SettingStack: View {
     private let embedInNavigationStack: Bool
 
     /**
+     When searching, the amount of vertical padding between the bottom of the search bar and the top of the first result
+     */
+    private let searchResultsVerticalPadding: CGFloat
+
+    /**
      Whether to show a search bar or not.
      */
     private let isSearchable: Bool
@@ -50,10 +55,12 @@ public struct SettingStack: View {
      */
     public init(
         isSearchable: Bool = true,
+        searchResultsVerticalPadding: CGFloat = 6.0,
         embedInNavigationStack: Bool = true,
         page: @escaping () -> SettingPage
     ) {
         self.isSearchable = isSearchable
+        self.searchResultsVerticalPadding = searchResultsVerticalPadding
         self.embedInNavigationStack = embedInNavigationStack
         self.page = page
     }
@@ -68,6 +75,7 @@ public struct SettingStack: View {
      */
     public init<Content>(
         isSearchable: Bool,
+        searchResultsVerticalPadding: CGFloat = 6.0,
         settingViewModel: SettingViewModel,
         embedInNavigationStack: Bool = true,
         page: @escaping () -> SettingPage,
@@ -76,6 +84,7 @@ public struct SettingStack: View {
         self._settingViewModel = StateObject(wrappedValue: settingViewModel)
         self.embedInNavigationStack = embedInNavigationStack
         self.isSearchable = isSearchable
+        self.searchResultsVerticalPadding = searchResultsVerticalPadding
         self.page = page
         self.customNoResultsView = AnyView(customNoResultsView())
     }
@@ -126,7 +135,7 @@ public struct SettingStack: View {
                 let searchResult = settingViewModel.searchResult,
                 !searchResult.sections.isEmpty
             {
-                SettingSearchResultView(searchResult: searchResult)
+                SettingSearchResultView(searchResult: searchResult, verticalPadding: searchResultsVerticalPadding)
             } else {
                 if let customNoResultsView {
                     customNoResultsView

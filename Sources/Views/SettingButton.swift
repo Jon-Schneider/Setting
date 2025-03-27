@@ -109,7 +109,7 @@ public extension SettingButton {
         return button
     }
 
-    func indicator(_ indicator: String) -> SettingButton {
+    func indicator(_ indicator: String?) -> SettingButton {
         var button = self
         button.indicator = indicator
         return button
